@@ -3631,11 +3631,11 @@ class ParticlePlanet:
         The material ID of each particle. (See the README.md documentation.)
     """
 
-    def __init__(self, planet, N_particles, N_ngb=48, verbosity=1):
+    def __init__(self, planet, N_particles, N_ngb=48, verbosity=1, more_shells=None):
         self.N_particles = N_particles
         self.N_ngb = N_ngb
 
-        assert isinstance(planet, Planet) or isinstance(planet, SpinPlanet)
+        assert isinstance(planet, woma.Planet) or isinstance(planet, SpinPlanet)
         assert self.N_particles is not None
 
         utils.load_eos_tables(planet.A1_mat_layer)
@@ -3650,6 +3650,7 @@ class ParticlePlanet:
                 planet.A1_T[1:],
                 planet.A1_P[1:],
                 verbosity=verbosity,
+                A1_force_more_shells=more_shells,
             )
 
             self.A1_x = particles.A1_x
