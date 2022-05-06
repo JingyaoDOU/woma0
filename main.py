@@ -18,7 +18,7 @@ Sergio Ruiz-Bonilla: sergio.ruiz-bonilla@durham.ac.uk
 Jacob Kegerreis: jacob.kegerreis@durham.ac.uk
 
 Visit https://github.com/srbonilla/woma to download the code including examples 
-and for support.
+and for support.ss
 """
 
 import numpy as np
@@ -31,7 +31,7 @@ from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical, L4_sp
 import woma.spin_funcs.utils_spin as us
 from woma.misc import glob_vars as gv
 from woma.misc import utils, io
-from woma.eos import eos
+from woma.eos import eos, tillotson, sesame, idg, hm80
 from woma.eos.T_rho import T_rho, T_rho_id_and_args_from_type
 
 
@@ -529,6 +529,11 @@ class Planet:
         if verbosity >= 1:
             print("Done")
 
+    def calculate_entropies(self):
+
+        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_P, self.A1_mat_id)
+
+
     # ========
     # 1 Layer
     # ========
@@ -754,7 +759,7 @@ class Planet:
             self.print_info()
 
     def gen_prof_given_inner_prof(
-        self, mat, T_rho_type, rho_min=0, P_min=0, verbosity=1
+        self, mat, T_rho_type, rho_min=0, P_min=0, alpha=1.0, verbosity=1
     ):
         """Add a new layer on top of existing profiles by integrating outwards.
 
@@ -793,6 +798,7 @@ class Planet:
         self.A1_mat_id_layer = np.append(self.A1_mat_id_layer, mat_id)
 
         T_rho_type_id, T_rho_args = T_rho_id_and_args_from_type([T_rho_type])
+       
         self.A1_T_rho_type_id = np.append(self.A1_T_rho_type_id, T_rho_type_id)
         self.A1_T_rho_args = np.array(
             np.append(self.A1_T_rho_args, T_rho_args, axis=0), dtype="float"
@@ -825,7 +831,7 @@ class Planet:
             A1_mat_id,
         ) = L1_spherical.L1_integrate_out(
             self.A1_r[-1],
-            self.A1_r[1],
+            self.A1_r[1]*alpha,
             self.A1_m_enc[-1],
             self.A1_P[-1],
             self.A1_T[-1],
@@ -3577,7 +3583,7 @@ class SpinPlanet:
         self.update_attributes()
 
 
-class ParticlePlanet:
+class ParticlePlanet():
     """Place particles to precisely match spinning or spherical body profiles.
 
     See also README.md and tutorial.ipynb.
@@ -3631,16 +3637,17 @@ class ParticlePlanet:
         The material ID of each particle. (See the README.md documentation.)
     """
 
-    def __init__(self, planet, N_particles, N_ngb=48, verbosity=1, more_shells=None):
+    def __init__(self, planet, N_particles, N_ngb=48, verbosity=1, A1_more_shells=None):
         self.N_particles = N_particles
         self.N_ngb = N_ngb
-
-        assert isinstance(planet, Planet) or isinstance(planet, SpinPlanet)
+        
+        #assert isinstance(planet, Planet) or isinstance(planet, SpinPlanet)
         assert self.N_particles is not None
 
         utils.load_eos_tables(planet.A1_mat_layer)
 
-        if isinstance(planet, Planet):
+        #if isinstance(planet, Planet):
+        if True:
             particles = seagen.GenSphere(
                 self.N_particles,
                 planet.A1_r[1:],
@@ -3650,21 +3657,25 @@ class ParticlePlanet:
                 planet.A1_T[1:],
                 planet.A1_P[1:],
                 verbosity=verbosity,
-                A1_force_more_shells=more_shells,
+                A1_force_more_shells=A1_more_shells,
             )
+            self.particles = particles
 
-            self.A1_x = particles.A1_x
-            self.A1_y = particles.A1_y
-            self.A1_z = particles.A1_z
-            self.A1_r = np.sqrt(self.A1_x**2 + self.A1_y**2 + self.A1_z**2)
+            print(A1_more_shells)
+            
+            self.A1_x  = particles.A1_x
+            self.A1_y  = particles.A1_y
+            self.A1_z  = particles.A1_z
+            self.A1_XY = np.hypot(self.A1_x, self.A1_y)
+            self.A1_r  = np.hypot(self.A1_XY, self.A1_z)
             self.A1_vx = np.zeros_like(particles.A1_x)
             self.A1_vy = np.zeros_like(particles.A1_x)
             self.A1_vz = np.zeros_like(particles.A1_x)
-            self.A1_m = particles.A1_m
+            self.A1_m  = particles.A1_m
             self.A1_rho = particles.A1_rho
-            self.A1_u = particles.A1_u
-            self.A1_T = particles.A1_T
-            self.A1_P = particles.A1_P
+            self.A1_u   = particles.A1_u
+            self.A1_T   = particles.A1_T
+            self.A1_P   = particles.A1_P
             self.A1_mat_id = particles.A1_mat
             self.A1_id = np.arange(self.A1_m.shape[0])
 
@@ -3753,7 +3764,8 @@ class ParticlePlanet:
         A1_s : [float]
             The specific entropy of each particle (J K^-1 kg^-1).
         """
-        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
+        # Add pressure as a parameter since idg need P to calcualte s
+        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_P, self.A1_mat_id)
 
     def save(
         self,

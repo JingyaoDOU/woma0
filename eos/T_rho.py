@@ -46,7 +46,9 @@ def T_rho(rho, T_rho_type_id, T_rho_args, mat_id):
         if mat_type == gv.type_idg:
             # T rho^(1-gamma) = constant
             gamma = idg.idg_gamma(mat_id)
-            return T_rho_args[0] * rho ** (gamma - 1)
+            return rho ** (gamma - 1)/(gamma-1)
+            print('new')
+            #return T_rho_args[0] * rho ** (gamma - 1)
         elif mat_id == gv.id_HM80_HHe:
             return hm80.T_rho_HM80_HHe(rho, T_rho_args[0], T_rho_args[1])
         elif mat_type in [gv.type_SESAME, gv.type_ANEOS]:
@@ -57,6 +59,7 @@ def T_rho(rho, T_rho_type_id, T_rho_args, mat_id):
     # Fixed entropy, T_rho_args = [s,]
     elif T_rho_type_id == gv.type_ent:
         if mat_type in [gv.type_SESAME, gv.type_ANEOS]:
+            #print('in "T_rho" and T_rho_args:',T_rho_args[0] )
             return sesame.T_rho_s(rho, T_rho_args[0], mat_id)
         else:
             raise ValueError("Entropy not implemented for this material type")

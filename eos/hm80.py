@@ -394,7 +394,7 @@ def T_u_rho(u, rho, mat_id):
     log_T = (1 - intp_rho) * ((1 - intp_u) * log_T_1 + intp_u * log_T_2) + intp_rho * (
         (1 - intp_u) * log_T_3 + intp_u * log_T_4
     )
-
+    
     # Convert back from log
     return np.exp(log_T)
 

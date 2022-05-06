@@ -22,7 +22,7 @@ def idg_gamma(mat_id):
         Adiabatic index.
     """
     if mat_id == gv.id_idg_HHe:
-        return 1.4
+        return 5/3   # Previous it's 1.4 the value of air
     elif mat_id == gv.id_idg_N2:
         return 1.4
     elif mat_id == gv.id_idg_CO2:
@@ -164,5 +164,100 @@ def T_u_rho(u, rho, mat_id):
     T : float
         Temperature (K).
     """
-    raise ValueError("T_u_rho function not implemented for ideal gas.")
-    return 0.0
+
+    mat_type = mat_id // gv.type_factor
+    if mat_type == gv.type_idg:
+        print('T from Cv')
+        return u/C_V_idg(mat_id)
+    else:
+        raise ValueError("Invalid material ID")
+
+    #raise ValueError("T_u_rho function not implemented for ideal gas.")
+    #return 0.0
+
+
+@njit
+def u_P_rho(P, rho, mat_id):
+    """Compute the internal energy from the pressure and density
+
+    Parameters
+    ----------
+    u : float
+        Specific internal energy (J kg^-1).
+
+    P: float
+        Pressure  (Pa)
+
+
+    rho : float
+        Density (kg m^-3).
+
+    mat_id : int
+        Material id.
+
+    Returns
+    -------
+    T : float
+        Temperature (K).
+    """
+
+    gamma = idg_gamma(mat_id)
+    return (1/(gamma-1))*P/rho
+    
+    #raise ValueError("T_u_rho function not implemented for ideal gas.")
+    #return 0.0
+
+@njit
+def P_u_rho(u, rho, mat_id):
+    """Compute the pressure from the density and internal energy.
+
+    Parameters
+    ----------
+    u : float
+        Specific Internal Energy (J kg^-1).
+
+    rho : float
+        Density (kg m^-3).
+
+    mat_id : int
+        Material id.
+
+    Returns
+    -------
+    P : float
+        Pressure (Pa).
+    """
+
+    gamma = idg_gamma(mat_id)
+
+    return (gamma-1)*u*rho
+
+@njit
+def s_P_rho(P, rho, mat_id):
+    """Compute the specific entropy from the density and internal energy.
+
+    """
+
+    minus_gamma = -idg_gamma(mat_id)
+
+    return P * rho**(minus_gamma)
+
+@njit
+def T_rho(rho, mat_id):
+    """Compute the temperature from the density.
+
+    """
+
+    gamma = idg_gamma(mat_id)
+
+    return (rho**(gamma-1))/(gamma-1)
+
+@njit
+def u_s_rho(s,rho, mat_id):
+    """Compute the temperature from the density.
+
+    """
+
+    gamma = idg_gamma(mat_id)
+
+    return s * (rho**(gamma-1))/(gamma-1)
