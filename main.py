@@ -1,5 +1,5 @@
 """
-WoMa (World Maker)
+WoMa (World Maker) TEST ENV
 ====
 
 Create models of rotating (and non-rotating) planets (or stars etc.) by solving 
@@ -18,7 +18,7 @@ Sergio Ruiz-Bonilla: sergio.ruiz-bonilla@durham.ac.uk
 Jacob Kegerreis: jacob.kegerreis@durham.ac.uk
 
 Visit https://github.com/srbonilla/woma to download the code including examples 
-and for support.ss
+and for support.
 """
 
 import numpy as np
@@ -27,11 +27,11 @@ from scipy.interpolate import interp1d
 from copy import deepcopy
 import seagen
 
-from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical, L4_spherical
+from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical
 import woma.spin_funcs.utils_spin as us
 from woma.misc import glob_vars as gv
 from woma.misc import utils, io
-from woma.eos import eos, tillotson, sesame, idg, hm80
+from woma.eos import eos
 from woma.eos.T_rho import T_rho, T_rho_id_and_args_from_type
 
 
@@ -528,11 +528,10 @@ class Planet:
 
         if verbosity >= 1:
             print("Done")
-
+    
     def calculate_entropies(self):
 
         self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_P, self.A1_mat_id)
-
 
     # ========
     # 1 Layer
@@ -759,7 +758,7 @@ class Planet:
             self.print_info()
 
     def gen_prof_given_inner_prof(
-        self, mat, T_rho_type, rho_min=0, P_min=0, alpha=1.0, verbosity=1
+        self, mat, T_rho_type, rho_min=0, P_min=0, verbosity=1
     ):
         """Add a new layer on top of existing profiles by integrating outwards.
 
@@ -798,7 +797,6 @@ class Planet:
         self.A1_mat_id_layer = np.append(self.A1_mat_id_layer, mat_id)
 
         T_rho_type_id, T_rho_args = T_rho_id_and_args_from_type([T_rho_type])
-       
         self.A1_T_rho_type_id = np.append(self.A1_T_rho_type_id, T_rho_type_id)
         self.A1_T_rho_args = np.array(
             np.append(self.A1_T_rho_args, T_rho_args, axis=0), dtype="float"
@@ -831,7 +829,7 @@ class Planet:
             A1_mat_id,
         ) = L1_spherical.L1_integrate_out(
             self.A1_r[-1],
-            self.A1_r[1]*alpha,
+            self.A1_r[1],
             self.A1_m_enc[-1],
             self.A1_P[-1],
             self.A1_T[-1],
@@ -2031,24 +2029,6 @@ class Planet:
     def gen_prof_L3_find_R_R1_R2_given_M1_M2_M3(self):  ### WIP
         return None
 
-    # ========
-    # 4 Layers
-    # ========
-    def _4_layer_input(self):
-
-        assert self.num_layer == 4
-        assert self.P_s is not None
-        assert self.T_s is not None
-        assert self.rho_s is not None
-        assert self.A1_mat_id_layer[0] is not None
-        assert self.A1_T_rho_type_id[0] is not None
-        assert self.A1_mat_id_layer[1] is not None
-        assert self.A1_T_rho_type_id[1] is not None
-        assert self.A1_mat_id_layer[2] is not None
-        assert self.A1_T_rho_type_id[2] is not None
-        assert self.A1_mat_id_layer[3] is not None
-        assert self.A1_T_rho_type_id[3] is not None
-
 
 class SpinPlanet:
     """Create nested-spheroid profiles of a spinning body in equilibrium.
@@ -2168,7 +2148,6 @@ class SpinPlanet:
             return
         # Otherwise, require planet and period inputs
         else:
-            assert isinstance(planet, Planet)
             assert period is not None
 
         self.name = name
@@ -2308,11 +2287,7 @@ class SpinPlanet:
 
         # Escape speed
         self.v_esc_eq, self.v_esc_po = us.spin_escape_vel(
-            self.A1_r_eq,
-            self.A1_rho_eq,
-            self.A1_r_po,
-            self.A1_rho_po,
-            self.period,
+            self.A1_r_eq, self.A1_rho_eq, self.A1_r_po, self.A1_rho_po, self.period,
         )
 
         # Equatorial and polar radii
@@ -2524,8 +2499,7 @@ class SpinPlanet:
             (utils.add_whitespace("I_MR2", space), self.I_MR2),
         )
         print_try(
-            "    %s = %.5g  kg m^2 s^-1",
-            (utils.add_whitespace("L", space), self.L),
+           "    %s = %.5g  kg m^2 s^-1", (utils.add_whitespace("L", space), self.L),
         )
 
     def save(self, filename, verbosity=1):
@@ -3583,7 +3557,7 @@ class SpinPlanet:
         self.update_attributes()
 
 
-class ParticlePlanet():
+class ParticlePlanet:
     """Place particles to precisely match spinning or spherical body profiles.
 
     See also README.md and tutorial.ipynb.
@@ -3640,14 +3614,12 @@ class ParticlePlanet():
     def __init__(self, planet, N_particles, N_ngb=48, verbosity=1, A1_more_shells=None):
         self.N_particles = N_particles
         self.N_ngb = N_ngb
-        
-        #assert isinstance(planet, Planet) or isinstance(planet, SpinPlanet)
+
         assert self.N_particles is not None
 
         utils.load_eos_tables(planet.A1_mat_layer)
 
-        #if isinstance(planet, Planet):
-        if True:
+        if not hasattr(planet, "period"):
             particles = seagen.GenSphere(
                 self.N_particles,
                 planet.A1_r[1:],
@@ -3659,23 +3631,21 @@ class ParticlePlanet():
                 verbosity=verbosity,
                 A1_force_more_shells=A1_more_shells,
             )
-            self.particles = particles
-
             print(A1_more_shells)
-            
-            self.A1_x  = particles.A1_x
-            self.A1_y  = particles.A1_y
-            self.A1_z  = particles.A1_z
+
+            self.A1_x = particles.A1_x
+            self.A1_y = particles.A1_y
+            self.A1_z = particles.A1_z
             self.A1_XY = np.hypot(self.A1_x, self.A1_y)
             self.A1_r  = np.hypot(self.A1_XY, self.A1_z)
             self.A1_vx = np.zeros_like(particles.A1_x)
             self.A1_vy = np.zeros_like(particles.A1_x)
             self.A1_vz = np.zeros_like(particles.A1_x)
-            self.A1_m  = particles.A1_m
+            self.A1_m = particles.A1_m
             self.A1_rho = particles.A1_rho
-            self.A1_u   = particles.A1_u
-            self.A1_T   = particles.A1_T
-            self.A1_P   = particles.A1_P
+            self.A1_u = particles.A1_u
+            self.A1_T = particles.A1_T
+            self.A1_P = particles.A1_P
             self.A1_mat_id = particles.A1_mat
             self.A1_id = np.arange(self.A1_m.shape[0])
 
@@ -3687,7 +3657,7 @@ class ParticlePlanet():
 
             self.N_particles = particles.A1_x.shape[0]
 
-        if isinstance(planet, SpinPlanet):
+        if hasattr(planet, "period"):
 
             (
                 self.A1_x,
@@ -3749,7 +3719,7 @@ class ParticlePlanet():
         for mat_id, s in zip(A1_mat_id, A1_s_mat):
             self.A1_s[self.A1_mat_id == mat_id] = s
 
-    def calculate_entropies(self):
+    def calculate_entropies(self,useT=True):
         """
         Calculate the particles' specific entropies from their densities and
         temperatures.
@@ -3764,8 +3734,10 @@ class ParticlePlanet():
         A1_s : [float]
             The specific entropy of each particle (J K^-1 kg^-1).
         """
-        # Add pressure as a parameter since idg need P to calcualte s
-        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_P, self.A1_mat_id)
+        if useT:
+            self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_u, self.A1_mat_id)
+        else:
+            self.A1_s = eos.A1_s_u_rho(self.A1_u, self.A1_rho, self.A1_mat_id)
 
     def save(
         self,
