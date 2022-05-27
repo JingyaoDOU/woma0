@@ -759,7 +759,7 @@ class Planet:
             self.print_info()
 
     def gen_prof_given_inner_prof(
-        self, mat, T_rho_type, rho_min=0, P_min=0, alpha=1.0, verbosity=1
+        self, mat, T_rho_type, rho_min=0, P_min=0, alpha=1.0,T_begin=None, verbosity=1
     ):
         """Add a new layer on top of existing profiles by integrating outwards.
 
@@ -819,6 +819,9 @@ class Planet:
             self.A1_rho = self.A1_rho[::-1]
             self.A1_u = self.A1_u[::-1]
             self.A1_mat_id = self.A1_mat_id[::-1]
+        
+        if T_begin ==None:
+            T_begin = self.A1_T[-1]
 
         # Integrate the profiles outwards
         (
@@ -834,7 +837,7 @@ class Planet:
             self.A1_r[1]*alpha,
             self.A1_m_enc[-1],
             self.A1_P[-1],
-            self.A1_T[-1],
+            T_begin,
             self.A1_u[-1],
             self.A1_mat_id_layer[-1],
             self.A1_T_rho_type_id[-1],

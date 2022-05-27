@@ -260,6 +260,7 @@ def impact_pos_vel_b_v_c_r(
     """
     mu = G * (M_t + M_i)
     v_esc = np.sqrt(2 * mu / (R_t + R_i))
+    print('v_esc%f'%v_esc)
 
     # Convert to b and v_c (m/s) if necessary
     if units_b == "b":
@@ -287,7 +288,7 @@ def impact_pos_vel_b_v_c_r(
     if v_c == v_esc:
         # Initial speed and position
         v = np.sqrt(2 * mu / r)
-        y = v_c * y_c / v
+        y = v_c * y_c / vmis
         x = np.sqrt(r ** 2 - y ** 2)
 
         # True anomalies (actually the complementary angles)
@@ -441,7 +442,7 @@ def impact_pos_vel_b_v_c_t(
     desired time until contact by iteratively calling impact_pos_vel_b_v_c_r().
 
     As described in Appendix A of in Kegerreis et al. (2020) ApJ 897:161.
-
+     dada
     Parameters
     ----------
     b : float
