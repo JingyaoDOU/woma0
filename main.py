@@ -529,6 +529,9 @@ class Planet:
         if verbosity >= 1:
             print("Done")
 
+    def calculate_entropies(self):
+
+        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
 
     # ========
     # 1 Layer
