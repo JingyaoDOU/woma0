@@ -1,5 +1,5 @@
 """
-WoMa (World Maker)
+WoMa (World Maker)  jy_dev branch
 ====
 
 Create models of rotating (and non-rotating) planets (or stars etc.) by solving 
