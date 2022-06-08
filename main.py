@@ -758,7 +758,7 @@ class Planet:
             self.print_info()
 
     def gen_prof_given_inner_prof(
-        self, mat, T_rho_type, rho_min=0, P_min=0,T_begin=None, verbosity=1
+        self, mat, T_rho_type, rho_min=0, P_min=0,T_begin=None,alpha=1.0,verbosity=1
     ):
         """Add a new layer on top of existing profiles by integrating outwards.
 
@@ -830,7 +830,7 @@ class Planet:
             A1_mat_id,
         ) = L1_spherical.L1_integrate_out(
             self.A1_r[-1],
-            self.A1_r[1],
+            self.A1_r[1]*alpha,
             self.A1_m_enc[-1],
             self.A1_P[-1],
             T_begin,
