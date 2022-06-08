@@ -3612,7 +3612,7 @@ class ParticlePlanet:
         The material ID of each particle. (See the README.md documentation.)
     """
 
-    def __init__(self, planet, N_particles, N_ngb=48, verbosity=1):
+    def __init__(self, planet, N_particles, N_ngb=48,tuner=None, verbosity=1):
         self.N_particles = N_particles
         self.N_ngb = N_ngb
 
@@ -3629,9 +3629,11 @@ class ParticlePlanet:
                 planet.A1_u[1:],
                 planet.A1_T[1:],
                 planet.A1_P[1:],
+                tuner=tuner,
                 verbosity=verbosity,
             )
 
+            self.particles = particles
             self.A1_x = particles.A1_x
             self.A1_y = particles.A1_y
             self.A1_z = particles.A1_z

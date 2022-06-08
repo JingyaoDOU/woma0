@@ -638,7 +638,7 @@ class GenSphere(object):
     def __init__(self, N_picle_des, A1_r_prof, A1_rho_prof, A1_mat_prof=None,
                  A1_u_prof=None, A1_T_prof=None, A1_P_prof=None,
                  A1_m_rel_prof=None, do_stretch=True, A1_force_more_shells=None,
-                 verbosity=1):
+                 tuner=None, verbosity=1):
         """ Generate nested spherical shells of particles to match radial
             profiles.
 
@@ -726,6 +726,7 @@ class GenSphere(object):
         self.A1_P_prof      = A1_P_prof
         self.A1_m_rel_prof  = A1_m_rel_prof
         self.do_stretch     = do_stretch
+        self.gap_tuner      = tuner
         self.verbosity      = verbosity
 
         # Maximum number of attempts allowed for tweaking particle mass and
@@ -1298,6 +1299,12 @@ class GenSphere(object):
 
         self.A1_mat_shell = np.array(A1_mat_shell)
         self.A1_r_shell = np.array(A1_r_shell)
+        
+        if self.gap_tuner is not None:
+            print('last shell r=',self.A1_r_shell[-1])
+            print('repositioning last shell')
+            self.A1_r_shell[-1]*=self.gap_tuner
+            print('New r=',self.A1_r_shell[-1])
         
         self.A1_m_picle_shell   = np.array(A1_m_picle_shell)
         if self.verbosity >= 2:
