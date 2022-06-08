@@ -638,7 +638,7 @@ class GenSphere(object):
     def __init__(self, N_picle_des, A1_r_prof, A1_rho_prof, A1_mat_prof=None,
                  A1_u_prof=None, A1_T_prof=None, A1_P_prof=None,
                  A1_m_rel_prof=None, do_stretch=True, A1_force_more_shells=None,
-                 tuner=None, verbosity=1):
+                 tuner=None, force_num_shell=None,  verbosity=1):
         """ Generate nested spherical shells of particles to match radial
             profiles.
 
@@ -1159,8 +1159,8 @@ class GenSphere(object):
                 #     print('------:dN_picle_shell:%d'%dN_picle_shell)
 
                 if A1_force_more_shells[i_layer]:
-                    N_shell_init=9
-                    print('Force numer of layer=%d',N_shell_init)
+                    N_shell_init=force_num_shell
+                    print('Force numer of layer=%d'%N_shell_init)
                 # ========
                 # Change the number of particles in the first shell until either
                 # one more shell just fits or just until this number of shells
@@ -1174,7 +1174,7 @@ class GenSphere(object):
                     #print('1st situation')
 
                 # Got one less shell, so go back one step then done!
-                elif np.logical_and(N_shell == N_shell_init - 1,i_layer<3):
+                elif np.logical_and(N_shell == N_shell_init - 1,not A1_force_more_shells[i_layer]):
                     N_picle_shell   -= 1
 
                     # Repeat one more time to extend the final shell to include
@@ -1183,7 +1183,7 @@ class GenSphere(object):
                     #print('2nd situation')
 
                 # Shell number changed by more than +/-1 which shouldn't happen
-                elif np.logical_and(N_shell != N_shell_init,i_layer<3):
+                elif np.logical_and(N_shell != N_shell_init,not A1_force_more_shells[i_layer]):
                     raise RuntimeError(
                         "N_shell jumped from %d to %d! "
                         "\nCheck that the profile radii steps are dense enough "
