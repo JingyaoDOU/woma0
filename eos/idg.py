@@ -22,7 +22,7 @@ def idg_gamma(mat_id):
         Adiabatic index.
     """
     if mat_id == gv.id_idg_HHe:
-        return 1.4
+        return 5/3
     elif mat_id == gv.id_idg_N2:
         return 1.4
     elif mat_id == gv.id_idg_CO2:
