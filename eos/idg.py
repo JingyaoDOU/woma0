@@ -166,3 +166,13 @@ def T_u_rho(u, rho, mat_id):
     """
     raise ValueError("T_u_rho function not implemented for ideal gas.")
     return 0.0
+
+@njit
+def s_u_rho(u, rho, mat_id):
+    """Compute the entropy from the internal energy and density.
+
+    """
+
+    gamma = idg_gamma(mat_id)
+
+    return (gamma-1) * u * rho**(1-gamma)

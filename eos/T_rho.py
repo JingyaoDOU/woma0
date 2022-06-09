@@ -101,7 +101,6 @@ def set_T_rho_args(T, rho, T_rho_type_id, T_rho_args, mat_id):
         if mat_type == gv.type_idg:
             # T_rho_args = [T rho^(1-gamma),]
             gamma = idg.idg_gamma(mat_id)
-            print('gamma=',gamma)
             T_rho_args[0] = T * rho ** (1 - gamma)
 
         elif mat_id == gv.id_HM80_HHe:

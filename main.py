@@ -529,9 +529,12 @@ class Planet:
         if verbosity >= 1:
             print("Done")
 
-    def calculate_entropies(self):
-
-        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
+    def calculate_entropies(self,useU=False):
+        if useU:
+            self.A1_s = eos.A1_s_u_rho(self.A1_u, self.A1_rho, self.A1_mat_id)
+        else:
+            self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
+            
 
     # ========
     # 1 Layer
@@ -3720,7 +3723,7 @@ class ParticlePlanet:
         for mat_id, s in zip(A1_mat_id, A1_s_mat):
             self.A1_s[self.A1_mat_id == mat_id] = s
 
-    def calculate_entropies(self):
+    def calculate_entropies(self,useU=False):
         """
         Calculate the particles' specific entropies from their densities and
         temperatures.
@@ -3735,14 +3738,18 @@ class ParticlePlanet:
         A1_s : [float]
             The specific entropy of each particle (J K^-1 kg^-1).
         """
-        self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
-
+        if useU:
+            self.A1_s = eos.A1_s_u_rho(self.A1_u, self.A1_rho, self.A1_mat_id)
+        else:
+            self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
+    
     def save(
         self,
         filename,
         boxsize=0,
         file_to_SI=utils.SI_to_SI,
         do_entropies=False,
+        useU=False,
         verbosity=1,
     ):
         """Save the particle configuration to an HDF5 file.
@@ -3776,7 +3783,7 @@ class ParticlePlanet:
         if do_entropies:
             # Calculate the entropies if not already set
             if not hasattr(self, "A1_s"):
-                self.calculate_entropies()
+                self.calculate_entropies(useU=useU)
             A1_s = self.A1_s
         else:
             A1_s = None
