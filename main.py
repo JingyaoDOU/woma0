@@ -3652,7 +3652,9 @@ class ParticlePlanet:
             self.A1_P = particles.A1_P
             self.A1_mat_id = particles.A1_mat
             self.A1_id = np.arange(self.A1_m.shape[0])
-
+            XY = np.hypot(self.A1_x, self.A1_y)
+            self.R = np.hypot(XY,self.A1_z)
+            
             # Smoothing lengths, crudely estimated from the densities
             w_edge = 2  # r/h at which the kernel goes to zero
             self.A1_h = (
