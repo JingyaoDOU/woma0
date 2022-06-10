@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from woma.misc import glob_vars as gv
-from woma.eos import eos
+from woma.eos import eos,idg
 from woma.eos.T_rho import T_rho, set_T_rho_args
 
 
@@ -125,7 +125,7 @@ def L1_integrate(num_prof, R, M, P_s, T_s, rho_s, mat_id, T_rho_type_id, T_rho_a
 
 @njit
 def L1_integrate_out(
-    r, dr, m_enc, P, T, u, mat_id, T_rho_type_id, T_rho_args, rho_min=0, P_min=0
+    r, dr, m_enc, P, T, u, mat_id, T_rho_type_id, T_rho_args, rho_min=0, P_min=0,idgurhop=False
 ):
     """Integrate a new layer of a spherical planet outwards.
 
@@ -229,7 +229,10 @@ def L1_integrate_out(
         )
         A1_rho.append(rho)
         A1_T.append(T_rho(rho, T_rho_type_id, T_rho_args, mat_id))
-        A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
+        if mat_id == 0 and idgurhop:
+            A1_u.append(idg.u_rho_P(rho, A1_P[-1], mat_id))
+        else:
+            A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
         A1_mat_id.append(mat_id)
 
     # Remove the duplicate first step and the final too-low density or too-low

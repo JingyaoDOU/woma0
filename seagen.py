@@ -1160,7 +1160,7 @@ class GenSphere(object):
 
                 if A1_force_more_shells[i_layer]:
                     N_shell_init=force_num_shell
-                    print('Force numer of layer=%d'%N_shell_init)
+                    #print('Force numer of layer=%d'%N_shell_init)
                 # ========
                 # Change the number of particles in the first shell until either
                 # one more shell just fits or just until this number of shells

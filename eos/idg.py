@@ -176,3 +176,12 @@ def s_u_rho(u, rho, mat_id):
     gamma = idg_gamma(mat_id)
 
     return (gamma-1) * u * rho**(1-gamma)
+
+@njit
+def u_rho_P(rho, P, mat_id):
+    """Compute the internal energy from the density and pressure.
+
+    """
+    gamma = idg_gamma(mat_id)
+
+    return P / (rho * (gamma-1))

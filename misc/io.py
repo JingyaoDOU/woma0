@@ -12,6 +12,7 @@ import sys
 
 from woma.misc import glob_vars as gv
 from woma.misc.utils import SI_to_SI, SI_to_cgs
+from woma.eos import eos
 
 
 # HDF5 labels
@@ -253,7 +254,8 @@ def save_particle_data(
     A1_P *= SI_to_file.P
     A1_u *= SI_to_file.u
     if A1_s is not None:
-        A1_s *= SI_to_file.s
+        A1_s[A1_mat_id!=0] *= SI_to_file.s
+        A1_s[A1_mat_id==0] = eos.A1_s_u_rho(A1_u[A1_mat_id==0], A1_rho[A1_mat_id==0], A1_mat_id[A1_mat_id==0])
 
     # Shift to box coordinates
     A2_pos += boxsize / 2.0

@@ -761,7 +761,7 @@ class Planet:
             self.print_info()
 
     def gen_prof_given_inner_prof(
-        self, mat, T_rho_type, rho_min=0, P_min=0,T_begin=None,alpha=1.0,verbosity=1
+        self, mat, T_rho_type, rho_min=0, P_min=0,T_begin=None,alpha=1.0,idgurhop=False,verbosity=1
     ):
         """Add a new layer on top of existing profiles by integrating outwards.
 
@@ -843,6 +843,7 @@ class Planet:
             self.A1_T_rho_args[-1],
             rho_min=self.rho_min,
             P_min=self.P_min,
+            idgurhop=idgurhop,
         )
 
         # Apppend the new layer to the full profiles
@@ -3654,7 +3655,7 @@ class ParticlePlanet:
             self.A1_id = np.arange(self.A1_m.shape[0])
             XY = np.hypot(self.A1_x, self.A1_y)
             self.R = np.hypot(XY,self.A1_z)
-            
+
             # Smoothing lengths, crudely estimated from the densities
             w_edge = 2  # r/h at which the kernel goes to zero
             self.A1_h = (
