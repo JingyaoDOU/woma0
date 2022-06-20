@@ -308,9 +308,10 @@ def impact_pos_vel_b_v_c_r(
 
         # Periapsis and eccentricity
         r_p = min(
-            abs(0.5 * (a + np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
-            abs(0.5 * (a - np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
+            abs(1.0 * (a + np.sqrt(a ** 2 - 1 * a * v_c ** 2 * y_c ** 2 / mu))),
+            abs(1.0 * (a - np.sqrt(a ** 2 - 1 * a * v_c ** 2 * y_c ** 2 / mu))),
         )
+        
         e = 1 - r_p / a
 
         # Check requested separation is valid
