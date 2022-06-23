@@ -13,6 +13,7 @@ import sys
 from woma.misc import glob_vars as gv
 from woma.misc.utils import SI_to_SI, SI_to_cgs
 from woma.eos import eos
+from gadget import Snapshot
 
 
 # HDF5 labels
@@ -211,6 +212,7 @@ def save_particle_data(
     boxsize=0,
     file_to_SI=SI_to_SI,
     verbosity=1,
+    GADGET=False,
 ):
     """Save particle data to an hdf5 file.
 
@@ -260,88 +262,120 @@ def save_particle_data(
     # Shift to box coordinates
     A2_pos += boxsize / 2.0
 
-    # Print info
-    if verbosity >= 1:
-        print("")
-        print("num_particle = %d" % num_particle)
-        print("boxsize      = %.2g" % boxsize)
-        print("mat_id       = ", end="")
-        for mat_id in np.unique(A1_mat_id):
-            print("%d " % mat_id, end="")
-        print("\n")
-        print("Unit mass    = %.5e g" % (file_to_SI.m * SI_to_cgs.m))
-        print("Unit length  = %.5e cm" % (file_to_SI.l * SI_to_cgs.l))
-        print("Unit time    = %.5e s" % file_to_SI.t)
-        print("")
-        print("Min, max values (file units):")
-        print(
-            "  pos = [%.5g, %.5g,    %.5g, %.5g,    %.5g, %.5g]"
-            % (
-                np.amin(A2_pos[:, 0]),
-                np.amax(A2_pos[:, 0]),
-                np.amin(A2_pos[:, 1]),
-                np.amax(A2_pos[:, 1]),
-                np.amin(A2_pos[:, 2]),
-                np.amax(A2_pos[:, 2]),
+    if GADGET:
+        num_particles=len(A1_m)
+        s=Snapshot()
+        s.header.npart             = [num_particles,0,0,0,0,0]
+        s.header.mass              = [0., 0., 0., 0., 0., 0.]
+        s.header.time              = 0.0
+        s.header.redshift          = 0.0
+        s.header.flag_sfr          = 0
+        s.header.flag_feedbacktp   = 0
+        s.header.npartTotal        = [num_particles,0,0,0,0,0]
+        s.header.flag_cooling      = 0
+        s.header.num_files         = 1
+        s.header.BoxSize           = 0.0
+        s.header.Omega0            = 0.0
+        s.header.OmegaLambda       = 0.0
+        s.header.HubbleParam       = 1.0
+        s.header.flag_stellarage   = 0
+        s.header.flag_metals       = 0
+        s.header.nallhw            = [0, 0, 0, 0, 0, 0]
+        s.header.flag_entr_ics     = 1
+
+        s.N                        = num_particles
+        s.pos                      = A2_pos
+        s.vel                      = A2_vel
+        s.id                       = A1_id
+        s.m                        = A1_m
+        s.S                        = A1_s
+        s.rho                      = A1_rho
+        s.hsml                     = A1_h
+        s.pot                      = np.zeros_like(A1_m)
+        s.write(str(f))
+    else:
+        # Print info
+        if verbosity >= 1:
+            print("")
+            print("num_particle = %d" % num_particle)
+            print("boxsize      = %.2g" % boxsize)
+            print("mat_id       = ", end="")
+            for mat_id in np.unique(A1_mat_id):
+                print("%d " % mat_id, end="")
+            print("\n")
+            print("Unit mass    = %.5e g" % (file_to_SI.m * SI_to_cgs.m))
+            print("Unit length  = %.5e cm" % (file_to_SI.l * SI_to_cgs.l))
+            print("Unit time    = %.5e s" % file_to_SI.t)
+            print("")
+            print("Min, max values (file units):")
+            print(
+                "  pos = [%.5g, %.5g,    %.5g, %.5g,    %.5g, %.5g]"
+                % (
+                    np.amin(A2_pos[:, 0]),
+                    np.amax(A2_pos[:, 0]),
+                    np.amin(A2_pos[:, 1]),
+                    np.amax(A2_pos[:, 1]),
+                    np.amin(A2_pos[:, 2]),
+                    np.amax(A2_pos[:, 2]),
+                )
             )
-        )
-        print(
-            "  vel = [%.5g, %.5g,    %.5g, %.5g,    %.5g, %.5g]"
-            % (
-                np.amin(A2_vel[:, 0]),
-                np.amax(A2_vel[:, 0]),
-                np.amin(A2_vel[:, 1]),
-                np.amax(A2_vel[:, 1]),
-                np.amin(A2_vel[:, 2]),
-                np.amax(A2_vel[:, 2]),
+            print(
+                "  vel = [%.5g, %.5g,    %.5g, %.5g,    %.5g, %.5g]"
+                % (
+                    np.amin(A2_vel[:, 0]),
+                    np.amax(A2_vel[:, 0]),
+                    np.amin(A2_vel[:, 1]),
+                    np.amax(A2_vel[:, 1]),
+                    np.amin(A2_vel[:, 2]),
+                    np.amax(A2_vel[:, 2]),
+                )
             )
-        )
-        for name, array in zip(
-            ["m", "rho", "P", "u", "h"], [A1_m, A1_rho, A1_P, A1_u, A1_h]
-        ):
-            print("  %s = %.5g, %.5g" % (name, np.amin(array), np.amax(array)))
+            for name, array in zip(
+                ["m", "rho", "P", "u", "h"], [A1_m, A1_rho, A1_P, A1_u, A1_h]
+            ):
+                print("  %s = %.5g, %.5g" % (name, np.amin(array), np.amax(array)))
+            if A1_s is not None:
+                print("  s = %.5g, %.5g" % (np.amin(A1_s), np.amax(A1_s)))
+            print("")
+
+        # Save
+        # Header
+        grp = f.create_group("/Header")
+        grp.attrs["BoxSize"] = [boxsize] * 3
+        grp.attrs["NumPart_Total"] = [num_particle, 0, 0, 0, 0, 0]
+        grp.attrs["NumPart_Total_HighWord"] = [0, 0, 0, 0, 0, 0]
+        grp.attrs["NumPart_ThisFile"] = [num_particle, 0, 0, 0, 0, 0]
+        grp.attrs["Time"] = 0.0
+        grp.attrs["NumFilesPerSnapshot"] = 1
+        grp.attrs["MassTable"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        grp.attrs["Flag_Entropy_ICs"] = 0
+        grp.attrs["Dimension"] = 3
+
+        # Runtime parameters
+        grp = f.create_group("/RuntimePars")
+        grp.attrs["PeriodicBoundariesOn"] = 0
+
+        # Units
+        grp = f.create_group("/Units")
+        grp.attrs["Unit mass in cgs (U_M)"] = file_to_SI.m * SI_to_cgs.m
+        grp.attrs["Unit length in cgs (U_L)"] = file_to_SI.l * SI_to_cgs.l
+        grp.attrs["Unit time in cgs (U_t)"] = file_to_SI.t
+        grp.attrs["Unit current in cgs (U_I)"] = 1.0
+        grp.attrs["Unit temperature in cgs (U_T)"] = 1.0
+
+        # Particles
+        grp = f.create_group("/PartType0")
+        grp.create_dataset(Di_hdf5_particle_label["pos"], data=A2_pos, dtype="d")
+        grp.create_dataset(Di_hdf5_particle_label["vel"], data=A2_vel, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["m"], data=A1_m, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["h"], data=A1_h, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["rho"], data=A1_rho, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["P"], data=A1_P, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["u"], data=A1_u, dtype="f")
+        grp.create_dataset(Di_hdf5_particle_label["id"], data=A1_id, dtype="L")
+        grp.create_dataset(Di_hdf5_particle_label["mat_id"], data=A1_mat_id, dtype="i")
         if A1_s is not None:
-            print("  s = %.5g, %.5g" % (np.amin(A1_s), np.amax(A1_s)))
-        print("")
+            grp.create_dataset(Di_hdf5_particle_label["s"], data=A1_s, dtype="f")
 
-    # Save
-    # Header
-    grp = f.create_group("/Header")
-    grp.attrs["BoxSize"] = [boxsize] * 3
-    grp.attrs["NumPart_Total"] = [num_particle, 0, 0, 0, 0, 0]
-    grp.attrs["NumPart_Total_HighWord"] = [0, 0, 0, 0, 0, 0]
-    grp.attrs["NumPart_ThisFile"] = [num_particle, 0, 0, 0, 0, 0]
-    grp.attrs["Time"] = 0.0
-    grp.attrs["NumFilesPerSnapshot"] = 1
-    grp.attrs["MassTable"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    grp.attrs["Flag_Entropy_ICs"] = 0
-    grp.attrs["Dimension"] = 3
-
-    # Runtime parameters
-    grp = f.create_group("/RuntimePars")
-    grp.attrs["PeriodicBoundariesOn"] = 0
-
-    # Units
-    grp = f.create_group("/Units")
-    grp.attrs["Unit mass in cgs (U_M)"] = file_to_SI.m * SI_to_cgs.m
-    grp.attrs["Unit length in cgs (U_L)"] = file_to_SI.l * SI_to_cgs.l
-    grp.attrs["Unit time in cgs (U_t)"] = file_to_SI.t
-    grp.attrs["Unit current in cgs (U_I)"] = 1.0
-    grp.attrs["Unit temperature in cgs (U_T)"] = 1.0
-
-    # Particles
-    grp = f.create_group("/PartType0")
-    grp.create_dataset(Di_hdf5_particle_label["pos"], data=A2_pos, dtype="d")
-    grp.create_dataset(Di_hdf5_particle_label["vel"], data=A2_vel, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["m"], data=A1_m, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["h"], data=A1_h, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["rho"], data=A1_rho, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["P"], data=A1_P, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["u"], data=A1_u, dtype="f")
-    grp.create_dataset(Di_hdf5_particle_label["id"], data=A1_id, dtype="L")
-    grp.create_dataset(Di_hdf5_particle_label["mat_id"], data=A1_mat_id, dtype="i")
-    if A1_s is not None:
-        grp.create_dataset(Di_hdf5_particle_label["s"], data=A1_s, dtype="f")
-
-    if verbosity >= 1:
-        print('Saved "%s"' % f.filename[-64:])
+        if verbosity >= 1:
+            print('Saved "%s"' % f.filename[-64:])
