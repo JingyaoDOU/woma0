@@ -260,10 +260,12 @@ def save_particle_data(
         A1_s[A1_mat_id==0] = eos.A1_s_u_rho(A1_u[A1_mat_id==0], A1_rho[A1_mat_id==0], A1_mat_id[A1_mat_id==0])
 
     # Shift to box coordinates
-    A2_pos += boxsize / 2.0
+    
 
     if GADGET:
+        print(A2_pos.shape)
         num_particles=len(A1_m)
+        print(num_particles)
         s=Snapshot()
         s.header.npart             = [num_particles,0,0,0,0,0]
         s.header.mass              = [0., 0., 0., 0., 0., 0.]
@@ -284,16 +286,16 @@ def save_particle_data(
         s.header.flag_entr_ics     = 1
 
         s.N                        = num_particles
-        s.pos                      = A2_pos
-        s.vel                      = A2_vel
-        s.id                       = A1_id
-        s.m                        = A1_m
-        s.S                        = A1_s
-        s.rho                      = A1_rho
-        s.hsml                     = A1_h
-        s.pot                      = np.zeros_like(A1_m)
-        s.write(str(f))
+        s.pos                      = np.array(A2_pos)
+        s.vel                      = np.array(A2_vel)
+        s.id                       = np.array(A1_id)
+        s.m                        = np.array(A1_m)
+        s.S                        = np.array(A1_s)
+
+        s.write('/data/trappist1/Jingyao/swift/impact/swift_EOAimpact_0d89797EOA_0d09impactor_45B_1d0vesc_3600s_100box_1node/STG_benchimpact_1e6')
+        print(s.pos[0])
     else:
+        A2_pos += boxsize / 2.0
         # Print info
         if verbosity >= 1:
             print("")
