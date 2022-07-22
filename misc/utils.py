@@ -206,11 +206,7 @@ SI_to_cgs = cgs_to_SI.inv()
 
 
 def impact_pos_vel_b_v_c_r(
-<<<<<<< HEAD
     b, v_c, r, R_t, R_i, M_t, M_i, units_b="b", units_v_c="m/s", return_t=False
-=======
-    b, v_c, r, R_t, R_i, M_t, M_i, units_b="b", units_v_c="m/s", return_t=False, debug=False,
->>>>>>> jy_dev
 ):
     """
     Calculate the intial position and velocity of an impactor to result in the
@@ -311,24 +307,10 @@ def impact_pos_vel_b_v_c_r(
         x = np.sqrt(r ** 2 - y ** 2)
 
         # Periapsis and eccentricity
-<<<<<<< HEAD
         r_p = min(
             abs(0.5 * (a + np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
             abs(0.5 * (a - np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
         )
-=======
-        if debug:
-            r_p = min(
-                abs(0.5 * (a + np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
-                abs(0.5 * (a - np.sqrt(a ** 2 - 2 * a * v_c ** 2 * y_c ** 2 / mu))),
-            )
-        else:
-            r_p = min(
-                abs(1.0 * (a + np.sqrt(a ** 2 - 1 * a * v_c ** 2 * y_c ** 2 / mu))),
-                abs(1.0 * (a - np.sqrt(a ** 2 - 1 * a * v_c ** 2 * y_c ** 2 / mu))),
-            )
-
->>>>>>> jy_dev
         e = 1 - r_p / a
 
         # Check requested separation is valid
@@ -448,11 +430,7 @@ def impact_pos_vel_b_v_c_r(
 
 
 def impact_pos_vel_b_v_c_t(
-<<<<<<< HEAD
     b, v_c, t, R_t, R_i, M_t, M_i, units_b="b", units_v_c="m/s", r_max_factor=100
-=======
-    b, v_c, t, R_t, R_i, M_t, M_i, units_b="b", units_v_c="m/s", r_max_factor=100,debug=False,
->>>>>>> jy_dev
 ):
     """
     Calculate the intial position and velocity of an impactor to result in the
@@ -543,11 +521,7 @@ def impact_pos_vel_b_v_c_t(
             raise RuntimeError("Failed to find r(t) after %d iterations" % (i))
 
     return impact_pos_vel_b_v_c_r(
-<<<<<<< HEAD
         b, v_c, r, R_t, R_i, M_t, M_i, units_b=units_b, units_v_c=units_v_c
-=======
-        b, v_c, r, R_t, R_i, M_t, M_i, units_b=units_b, units_v_c=units_v_c, debug=debug
->>>>>>> jy_dev
     )
 
 
@@ -722,10 +696,7 @@ def load_eos_tables(A1_mat_input=None):
         A1_mat = list(gv.Di_mat_id.keys())
     else:
         A1_mat = list(A1_mat_input.copy())
-<<<<<<< HEAD
         #print('+++++',A1_mat)
-=======
->>>>>>> jy_dev
     # Discard idg materials
     A1_idg = []
     for material in A1_mat:

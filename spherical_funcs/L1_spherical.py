@@ -125,11 +125,7 @@ def L1_integrate(num_prof, R, M, P_s, T_s, rho_s, mat_id, T_rho_type_id, T_rho_a
 
 @njit
 def L1_integrate_out(
-<<<<<<< HEAD
     r, dr, m_enc, P, T, u, mat_id, T_rho_type_id, T_rho_args, rho_min=0, P_min=0
-=======
-    r, dr, m_enc, P, T, u, mat_id, T_rho_type_id, T_rho_args, rho_min=0, P_min=0,idgurhop=False
->>>>>>> jy_dev
 ):
     """Integrate a new layer of a spherical planet outwards.
 
@@ -198,13 +194,8 @@ def L1_integrate_out(
     A1_T = [T]
     A1_u = [u]
     A1_mat_id = [mat_id]
-<<<<<<< HEAD
     A1_rho = [eos.rho_P_T(A1_P[0], A1_T[0], mat_id)] ## find new rho based on T and P
     dS = 0
-=======
-    A1_rho = [eos.rho_P_T(A1_P[0], A1_T[0], mat_id)]
-
->>>>>>> jy_dev
     # Integrate outwards until the minimum density (or zero pressure)
     while A1_rho[-1] > rho_min and A1_P[-1] > P_min:
         A1_r.append(A1_r[-1] + dr)
@@ -220,12 +211,8 @@ def L1_integrate_out(
             A1_mat_id.append(0)
             break
         # Update the T-rho parameters
-<<<<<<< HEAD
         if T_rho_type_id == gv.type_adb and np.logical_or(mat_id == gv.id_HM80_HHe,mat_id == gv.id_idg_HHe):
             #print('set args for idg')
-=======
-        if T_rho_type_id == gv.type_adb and (mat_id == gv.id_HM80_HHe or mat_id == gv.id_idg_HHe):
->>>>>>> jy_dev
             T_rho_args = set_T_rho_args(
                 A1_T[-1],
                 A1_rho[-1],
@@ -241,7 +228,6 @@ def L1_integrate_out(
             0.9 * A1_rho[-1],
             A1_rho[-1],
         )
-<<<<<<< HEAD
         #T = T_rho(rho, T_rho_type_id, T_rho_args, mat_id)
         #S = eos.s_rho_T(rho, T, mat_id)#
         
@@ -252,12 +238,6 @@ def L1_integrate_out(
             #A1_u.append(idg.u_P_rho(A1_P[-1], A1_rho[-1], mat_id))
             A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
             print('test')
-=======
-        A1_rho.append(rho)
-        A1_T.append(T_rho(rho, T_rho_type_id, T_rho_args, mat_id))
-        if mat_id == 0 and idgurhop:
-            A1_u.append(idg.u_rho_P(rho, A1_P[-1], mat_id))
->>>>>>> jy_dev
         else:
             A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
         A1_mat_id.append(mat_id)
