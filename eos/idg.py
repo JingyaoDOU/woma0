@@ -173,7 +173,7 @@ def T_u_rho(u, rho, mat_id):
     mat_type = mat_id // gv.type_factor
     if mat_type == gv.type_idg:
         print('T from Cv')
-        return u/C_V_idg(mat_id)
+        return T_rho(rho, mat_id) 
     else:
         raise ValueError("Invalid material ID")
 
