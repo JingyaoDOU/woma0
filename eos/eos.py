@@ -570,7 +570,7 @@ def s_rho_T(rho, T, mat_id):
         s = sesame.s_rho_T(rho, T, mat_id)
     elif mat_id==200:
         #print('set HM80 HHe entropy to zero')
-        s=0
+        raise ValueError("Please use U to compute the entropy if HM80 HHe involved.")
     else:
         raise ValueError("Entropy not implemented for this material type.")
     return s
@@ -636,8 +636,9 @@ def s_u_rho(u, rho, mat_id):
     if mat_type in [gv.type_SESAME, gv.type_ANEOS]:
         s = sesame.s_u_rho(u, rho, mat_id)
     elif mat_id==0:
-        #print('set HM80 HHe entropy to zero')
         s = idg.s_u_rho(u, rho, mat_id)
+    elif mat_id==200:
+        s = u # if HM80 HHe, the set the entropy to be the internal energy
     else:
         raise ValueError("Entropy not implemented for this material type.")
     return s
