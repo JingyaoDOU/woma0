@@ -1,5 +1,6 @@
 """
 WoMa (World Maker)  jy_dev branch
+from vscode
 ====
 
 Create models of rotating (and non-rotating) planets (or stars etc.) by solving 

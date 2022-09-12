@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../WoMa-master"
+		},
+		{
+			"path": "../swiftsim"
+		}
+	],
+	"settings": {}
+}
