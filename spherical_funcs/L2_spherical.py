@@ -180,6 +180,7 @@ def L2_integrate(
         if A1_m_enc[i] < 0:
             break
 
+    #return A1_r[1:], A1_m_enc[1:], A1_P[1:], A1_T[1:], A1_rho[1:], A1_u[1:], A1_mat_id[1:]
     return A1_r, A1_m_enc, A1_P, A1_T, A1_rho, A1_u, A1_mat_id
 
 

@@ -117,6 +117,7 @@ def set_T_rho_args(T, rho, T_rho_type_id, T_rho_args, mat_id):
         if mat_type in [gv.type_SESAME, gv.type_ANEOS]:
             # T_rho_args = [s,]
             #T_rho_args[0] = sesame.s_rho_T(rho, T, mat_id)
+            #print('Test')
             T_rho_args[0] = T_rho_args[0]
 
     else:

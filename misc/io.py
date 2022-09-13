@@ -13,7 +13,7 @@ import sys
 from woma.misc import glob_vars as gv
 from woma.misc.utils import SI_to_SI, SI_to_cgs
 from woma.eos import eos
-from gadget import Snapshot
+from woma.gadget import Snapshot
 
 
 # HDF5 labels
