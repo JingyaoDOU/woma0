@@ -25,7 +25,7 @@ import numpy as np
 import h5py
 from scipy.interpolate import interp1d
 from copy import deepcopy
-import seagen
+import woma.seagen
 
 from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical
 import woma.spin_funcs.utils_spin as us
