@@ -346,7 +346,7 @@ def P_T_rho(T, rho, mat_id):
     """
     mat_type = mat_id // gv.type_factor
     if mat_type == gv.type_idg:
-        P = idg.P_T_rho(T, rho, mat_id) ### P_u_rho instead
+        P = idg.P_T_rho(T, rho, mat_id)
     elif mat_type == gv.type_Til:
         P = tillotson.P_T_rho(T, rho, mat_id)
     elif mat_type == gv.type_HM80:
@@ -420,20 +420,15 @@ def T_u_rho(u, rho, mat_id):
     T : float
         Temperature (K).
     """
-
     mat_type = mat_id // gv.type_factor
-    
     if mat_type == gv.type_idg:
-        T = idg.T_rho(rho, mat_id)
+        T = idg.T_u_rho(u, rho, mat_id)
     elif mat_type == gv.type_Til:
         T = tillotson.T_u_rho(u, rho, mat_id)
-       
     elif mat_type == gv.type_HM80:
         T = hm80.T_u_rho(u, rho, mat_id)
-       
     elif mat_type in [gv.type_SESAME, gv.type_ANEOS]:
         T = sesame.T_u_rho(u, rho, mat_id)
-        
     else:
         raise ValueError("Invalid material ID")
     return T
@@ -460,18 +455,17 @@ def A1_T_u_rho(A1_u, A1_rho, A1_mat_id):
     A1_T : [float]
         Temperature (K).
     """
-    
+
     assert A1_u.ndim == 1
     assert A1_rho.ndim == 1
     assert A1_mat_id.ndim == 1
     assert A1_u.shape[0] == A1_rho.shape[0]
     assert A1_u.shape[0] == A1_mat_id.shape[0]
-    
+
     A1_T = np.zeros_like(A1_u)
-   
+
     for i, u in enumerate(A1_u):
         A1_T[i] = T_u_rho(A1_u[i], A1_rho[i], A1_mat_id[i])
-        
 
     return A1_T
 
@@ -511,7 +505,7 @@ def u_rho_T(rho, T, mat_id):
     else:
         raise ValueError("Invalid material ID")
     return u
-  #ss
+
 
 @njit
 def A1_u_rho_T(A1_rho, A1_T, A1_mat_id):
@@ -552,7 +546,7 @@ def A1_u_rho_T(A1_rho, A1_T, A1_mat_id):
 # Specific entropy
 # ========
 @njit
-def s_rho_T(rho, T, P, mat_id):
+def s_rho_T(rho, T, mat_id):
     """Compute the specific entropy from the density and temperature, for any EoS.
 
     Parameters
@@ -574,18 +568,13 @@ def s_rho_T(rho, T, P, mat_id):
     mat_type = mat_id // gv.type_factor
     if mat_type in [gv.type_SESAME, gv.type_ANEOS]:
         s = sesame.s_rho_T(rho, T, mat_id)
-    elif mat_id==200:
-        #print('set HM80 HHe entropy to zero')
-        s=0
-    elif mat_id==0:
-        s=idg.s_P_rho(P, rho, mat_id)
     else:
         raise ValueError("Entropy not implemented for this material type.")
     return s
 
 
 @njit
-def A1_s_rho_T(A1_rho, A1_T, A1_P, A1_mat_id):
+def A1_s_rho_T(A1_rho, A1_T, A1_mat_id):
     """Compute the specific entropies from arrays of density and temperature,
     for any EoS.
 
@@ -614,7 +603,7 @@ def A1_s_rho_T(A1_rho, A1_T, A1_P, A1_mat_id):
     A1_s = np.zeros_like(A1_T)
 
     for i, rho in enumerate(A1_rho):
-        A1_s[i] = s_rho_T(A1_rho[i], A1_T[i], A1_P[i], A1_mat_id[i])
+        A1_s[i] = s_rho_T(A1_rho[i], A1_T[i], A1_mat_id[i])
 
     return A1_s
 
@@ -787,13 +776,13 @@ def find_rho(P_des, mat_id, T_rho_type, T_rho_args, rho_min, rho_max):
     elif P_des < P_max < P_min:
         return rho_max
     else:
-        #For debugging
-        print('P_des:',P_des)
-        print('mat_id:',mat_id)
-        print('T_rho_type_args',T_rho_type, T_rho_args)
-        print('rho_min_max',rho_min, rho_max)
-        print('T_min_max',T_min, T_max)
-        print('P_min_max',P_min, P_max)
+        # For debugging
+        # print(P_des)
+        # print(mat_id)
+        # print(T_rho_type, T_rho_args)
+        # print(rho_min, rho_max)
+        # print(T_min, T_max)
+        # print(P_min, P_max)
         e = "Critical error in find_rho."
         raise ValueError(e)
 

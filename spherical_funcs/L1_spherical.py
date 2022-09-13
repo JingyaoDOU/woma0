@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from woma.misc import glob_vars as gv
-from woma.eos import eos,idg
+from woma.eos import eos
 from woma.eos.T_rho import T_rho, set_T_rho_args
 
 
@@ -194,8 +194,8 @@ def L1_integrate_out(
     A1_T = [T]
     A1_u = [u]
     A1_mat_id = [mat_id]
-    A1_rho = [eos.rho_P_T(A1_P[0], A1_T[0], mat_id)] ## find new rho based on T and P
-    dS = 0
+    A1_rho = [eos.rho_P_T(A1_P[0], A1_T[0], mat_id)]
+
     # Integrate outwards until the minimum density (or zero pressure)
     while A1_rho[-1] > rho_min and A1_P[-1] > P_min:
         A1_r.append(A1_r[-1] + dr)
@@ -211,8 +211,7 @@ def L1_integrate_out(
             A1_mat_id.append(0)
             break
         # Update the T-rho parameters
-        if T_rho_type_id == gv.type_adb and np.logical_or(mat_id == gv.id_HM80_HHe,mat_id == gv.id_idg_HHe):
-            #print('set args for idg')
+        if T_rho_type_id == gv.type_adb and mat_id == gv.id_HM80_HHe:
             T_rho_args = set_T_rho_args(
                 A1_T[-1],
                 A1_rho[-1],
@@ -228,18 +227,9 @@ def L1_integrate_out(
             0.9 * A1_rho[-1],
             A1_rho[-1],
         )
-        #T = T_rho(rho, T_rho_type_id, T_rho_args, mat_id)
-        #S = eos.s_rho_T(rho, T, mat_id)#
-        
-        #dS = np.abs(S-T_rho_args[0])
         A1_rho.append(rho)
         A1_T.append(T_rho(rho, T_rho_type_id, T_rho_args, mat_id))
-        if mat_id==0:
-            #A1_u.append(idg.u_P_rho(A1_P[-1], A1_rho[-1], mat_id))
-            A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
-            print('test')
-        else:
-            A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
+        A1_u.append(eos.u_rho_T(rho, A1_T[-1], mat_id))
         A1_mat_id.append(mat_id)
 
     # Remove the duplicate first step and the final too-low density or too-low

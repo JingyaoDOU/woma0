@@ -44,7 +44,7 @@ def V_eq_po_from_rho(A1_r_eq, A1_rho_eq, A1_r_po, A1_rho_po, period):
     assert A1_r_eq.shape[0] == A1_rho_eq.shape[0]
     assert A1_r_po.shape[0] == A1_rho_po.shape[0]
 
-    rho_model_po_inv = interp1d(A1_rho_po, A1_r_po)
+    rho_model_po_inv = interp1d(A1_rho_po, A1_r_po, fill_value="extrapolate")
 
     A1_R = A1_r_eq
     A1_Z = rho_model_po_inv(A1_rho_eq)
@@ -52,7 +52,7 @@ def V_eq_po_from_rho(A1_r_eq, A1_rho_eq, A1_r_po, A1_rho_po, period):
     A1_V_eq = np.zeros(A1_r_eq.shape)
     A1_V_po = np.zeros(A1_r_po.shape)
 
-    W = 2 * np.pi / (period * 60 ** 2)
+    W = 2 * np.pi / (period * 60**2)
 
     for i in range(A1_rho_eq.shape[0] - 1):
 
