@@ -25,7 +25,7 @@ import numpy as np
 import h5py
 from scipy.interpolate import interp1d
 from copy import deepcopy
-import woma.seagen
+import seagen
 
 from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical
 import woma.spin_funcs.utils_spin as us
@@ -528,7 +528,11 @@ class Planet:
 
         if verbosity >= 1:
             print("Done")
-
+    def calculate_entropies(self,useU=False):
+        if useU:
+            self.A1_s = eos.A1_s_u_rho(self.A1_u, self.A1_rho, self.A1_mat_id)
+        else:
+            self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
     # ========
     # 1 Layer
     # ========
@@ -2401,7 +2405,7 @@ class SpinPlanet:
         self.update_attributes()
 
         space = 12
-        print_try('SpinPlanet "%s": ', self.name)
+        #print_try('SpinPlanet "%s": ', self.name)
         print_try(
             '    %s = "%s"', (utils.add_whitespace("planet", space), self.planet.name)
         )

@@ -261,7 +261,8 @@ def load_table_SESAME(Fp_table):
     Fp_table = ut.check_end(Fp_table, ".txt")
     with open(Fp_table) as f:
         # Skip the header
-        for i in range(12):
+        print(f.readline())
+        for i in range(11):
             f.readline()
 
         # Skip the version date
