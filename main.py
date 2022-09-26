@@ -2134,7 +2134,7 @@ class SpinPlanet:
         self,
         planet=None,
         period=None,
-        name=None,
+        name="SpinPlanet",
         num_prof=1000,
         fix_mass=True,
         R_max_eq=None,
@@ -2407,7 +2407,7 @@ class SpinPlanet:
         self.update_attributes()
 
         space = 12
-        print_try('SpinPlanet "%s": ', self.name)
+        #print_try('SpinPlanet "%s": ', self.name)
         print_try(
             '    %s = "%s"', (utils.add_whitespace("planet", space), self.planet.name)
         )
