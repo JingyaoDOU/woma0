@@ -187,7 +187,10 @@ def load_table_SESAME(Fp_table):
     Fp_table = ut.check_end(Fp_table, ".txt")
     with open(Fp_table) as f:
         # Skip the header
-        for i in range(7):
+        firstline = f.readline()
+        print(firstline)
+
+        for i in range(6):
             f.readline()
 
         num_rho, num_T = np.array(f.readline().split(), dtype=int)
