@@ -4,7 +4,6 @@ WoMa SESAME and ANEOS (in SESAME-style tables) equations of state
 
 import numpy as np
 from numba import njit
-
 from woma.misc import glob_vars as gv
 from woma.misc import utils as ut
 
@@ -312,7 +311,8 @@ def load_phase_table_ANEOS_forsterite():
 
     ###WIP
     """
-    import os, sys
+    import os
+    import sys
 
     this_dir, this_file = os.path.split(__file__)
     path = os.path.join(this_dir, "../data/aneos-forsterite-2019/")
