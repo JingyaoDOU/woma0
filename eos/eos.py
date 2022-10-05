@@ -1069,7 +1069,7 @@ def plot_table_SESAME(mat, Z_choice, A1_fig_ax=None):
     cmap = plt.get_cmap("viridis")
     vmin = np.nanmin(A2_Z[A2_Z > 0])
     vmax = np.nanmax(A2_Z[A2_Z < np.inf])
-    norm = mpl.colors.LogNorm()
+    norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
 
     # Figure
     if A1_fig_ax is None:
@@ -1094,8 +1094,6 @@ def plot_table_SESAME(mat, Z_choice, A1_fig_ax=None):
             c=A2_Z[:, i_T],
             edgecolor="none",
             cmap=cmap,
-            vmin=vmin,
-            vmax=vmax,
             norm=norm,
         )
 
