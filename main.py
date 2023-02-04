@@ -21,18 +21,17 @@ Visit https://github.com/srbonilla/woma to download the code including examples
 and for support.
 """
 
-import numpy as np
-import h5py
-from scipy.interpolate import interp1d
 from copy import deepcopy
-import seagen
 
-from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical
+import h5py
+import numpy as np
 import woma.spin_funcs.utils_spin as us
-from woma.misc import glob_vars as gv
-from woma.misc import utils, io
+from scipy.interpolate import interp1d
 from woma.eos import eos
 from woma.eos.T_rho import T_rho, T_rho_id_and_args_from_type
+from woma.misc import glob_vars as gv
+from woma.misc import io, utils
+from woma.spherical_funcs import L1_spherical, L2_spherical, L3_spherical
 
 
 class Planet:
@@ -528,11 +527,13 @@ class Planet:
 
         if verbosity >= 1:
             print("Done")
-    def calculate_entropies(self,useU=False):
+
+    def calculate_entropies(self, useU=False):
         if useU:
             self.A1_s = eos.A1_s_u_rho(self.A1_u, self.A1_rho, self.A1_mat_id)
         else:
             self.A1_s = eos.A1_s_rho_T(self.A1_rho, self.A1_T, self.A1_mat_id)
+
     # ========
     # 1 Layer
     # ========
@@ -2405,7 +2406,7 @@ class SpinPlanet:
         self.update_attributes()
 
         space = 12
-        #print_try('SpinPlanet "%s": ', self.name)
+        # print_try('SpinPlanet "%s": ', self.name)
         print_try(
             '    %s = "%s"', (utils.add_whitespace("planet", space), self.planet.name)
         )
